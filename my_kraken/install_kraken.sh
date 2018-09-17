@@ -45,7 +45,7 @@ make -C src install
 for file in scripts/*
 do
   perl -pl -e 'BEGIN { while (@ARGV) { $_ = shift; ($k,$v) = split /=/, $_, 2; $H{$k} = $v } }'\
-           -e 's/#####=(\w+)=#####/$H{$1}/g' \
+           -e 's/#####=(\w+)=#####/$H{$1}/g' \ #This is the part that gets deleted and replaced in each filen
            "KRAKEN_DIR=$KRAKEN_DIR" "VERSION=$VERSION" \
            < "$file" > "$KRAKEN_DIR/$(basename $file)"
   if [ -x "$file" ]
