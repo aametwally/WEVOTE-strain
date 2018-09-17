@@ -70,36 +70,39 @@ int main(int argc, char **argv) {
   omp_set_num_threads(1);
   #endif
 
-// get all the arguments from perl wrapper (kraken.pl)
+// 1.get all the arguments from perl wrapper (kraken.pl)
   parse_command_line(argc, argv);
 
-  //Generate nodes file 
+  //2.Generate nodes file 
   if (! Nodes_filename.empty())
-    Parent_map = build_parent_map(Nodes_filename);
+    Parent_map = build_parent_map(Nodes_filename); //from krakenutil
 
   if (Populate_memory)
     cerr << "Loading database... ";
 
-  //Just open the db file
+  //3.Just open the db file
   QuickFile db_file;
   db_file.open_file(DB_filename);
 
   if (Populate_memory)
     db_file.load_file();
-  //load database
+  //4. load database
   Database = KrakenDB(db_file.ptr());
   KmerScanner::set_k(Database.get_k());
 
   QuickFile idx_file;
   idx_file.open_file(Index_filename);
+
   if (Populate_memory)
     idx_file.load_file();
+
   KrakenDBIndex db_index(idx_file.ptr());
   Database.set_index(&db_index);
 
   if (Populate_memory)
     cerr << "complete." << endl;
 
+  //5. Output stuff
   if (Print_classified) {
     if (Classified_output_file == "-")
       Classified_output = &cout;
@@ -155,9 +158,12 @@ int main(int argc, char **argv) {
   else
     Kraken_output = &cout;
 
+  //7. This is where stuff happens
   struct timeval tv1, tv2;
   gettimeofday(&tv1, NULL);
   for (int i = optind; i < argc; i++)
+      //right here! 
+      ////this looks at optind (which is the current index of argv after running through getopt(), and now all u have left are filename(s), so it loops through them
     process_file(argv[i]);
   gettimeofday(&tv2, NULL);
 

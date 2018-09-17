@@ -60,8 +60,6 @@ my $output_format = "legacy";
 my $outfile;
 
 GetOptions(
-  "help" => \&display_help,
-  "version" => \&display_version,
   "db=s" => \$db_prefix,
   "threads=i" => \$threads,
   "fasta-input" => \$fasta_input,
@@ -80,6 +78,7 @@ GetOptions(
   "bzip2-compressed" => \$bunzip2,
   "only-classified-output" => \$only_classified_output,
 );
+#this is a builtin perl function, any --option is on the left, and it's argument gets stored into a variable in the right.
 
 if (! defined $threads) {
   $threads = $ENV{"KRAKEN_NUM_THREADS"} || 1;
@@ -247,15 +246,7 @@ EOF
   exit $exit_code;
 }
 
-sub display_help {
-  usage(0);
-}
 
-sub display_version {
-  print "Kraken version #####=VERSION=#####\n";
-  print "Copyright 2013-2015, Derrick Wood (dwood\@cs.jhu.edu)\n";
-  exit 0;
-}
 
 sub auto_detect_file_format {
   my $magic;
