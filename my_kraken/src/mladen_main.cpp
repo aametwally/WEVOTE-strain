@@ -61,17 +61,14 @@ int main(int argc, char **argv){
     ifstream readsFile( argv[1] ); //read the file in argv1
     if (readsFile.is_open())
     {
-
 	//OPEN file and store each DNAseq into the vector<string> called dna_list
         while ( getline (readsFile,current_line) )
         {
-		if(current_line.size() > 0 && current_line[0] != '>')
-		{
-			dna_list.push_back(current_line);
-		}
+            if(current_line.size() > 3 && current_line[0] != '>')
+                dna_list.push_back(current_line);
         }
-
     }
+    cout << dna_list.size() << endl;
 
 
     QuickFile db_file;
@@ -106,7 +103,7 @@ int main(int argc, char **argv){
 
 
 
-    for (size_t j=0; j < 300; j++)
+    for (size_t j=0; j < dna_list.size(); j++)
         classify_sequence(dna_list[j],k1);
 
         (*Kraken_output) << k1.str();
@@ -126,10 +123,6 @@ int main(int argc, char **argv){
 
     return 0;
 }
-
-
-
-
 
 
 
@@ -169,8 +162,7 @@ void classify_sequence(string &dna, ostringstream &koss)
       }
       taxa.push_back(taxon);
     }
-  }
-
+}
 
   uint32_t call = 0;
   call = resolve_tree(hit_counts, Parent_map);
@@ -187,8 +179,6 @@ void classify_sequence(string &dna, ostringstream &koss)
   else {
     koss << "U\t";
   }
-  //koss << dna.id << "\t" << call << "\t" << dna.size() << "\t";
-  //replacing it with my version (no dna.id saved)
   koss << call << "\t" << dna.size() << "\t";
 
   if (taxa.empty())
