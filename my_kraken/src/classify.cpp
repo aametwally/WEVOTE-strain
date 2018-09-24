@@ -84,8 +84,10 @@ int main(int argc, char **argv) {
   QuickFile db_file;
   db_file.open_file(DB_filename);
 
-  if (Populate_memory)
+  if (Populate_memory){
     db_file.load_file();
+  }
+
   //4. load database
   Database = KrakenDB(db_file.ptr());
   KmerScanner::set_k(Database.get_k());
