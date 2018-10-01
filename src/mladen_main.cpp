@@ -2,13 +2,11 @@
 #include "krakendb.hpp"
 #include "krakenutil.hpp"
 #include "krakendb.hpp"
-#include "quickfile.hpp"
 
 
 
 using namespace std;
 using namespace kraken;
-
 
 
 const size_t DEF_WORK_UNIT_SIZE = 500000;
@@ -47,16 +45,15 @@ int main(int argc, char **argv){
     }
 
 
-    QuickFile db_file;
-    //db_file.open_file(DB_filename);
+    ////////////////OPEN DATABASE///////////////////////
     int fd;
     const char *dbfilename = DB_filename.c_str();
-    fd = open(dbfilename,O_RDONLY,0666);
-
-    size_t filesize;
-    char *fptr;
+    const char *idfilename = Index_filename.c_str();
+    size_t filesize, filesize_i;
+    char *fptr, *fptri;
     struct stat sb;
 
+    fd = open(dbfilename,O_RDONLY,0666);
     fstat(fd, &sb);
     filesize = sb.st_size;
 
@@ -66,12 +63,21 @@ int main(int argc, char **argv){
 
     Database = KrakenDB(fptr);
     KmerScanner::set_k(Database.get_k());
+    ///////////////////////////////
+
+
+
+    ////Index file opening//////
+    fd = open(idfilename, O_RDONLY,0666);
+    fstat(fd,&sb);
+    filesize_i = sb.st_size;
+    fptri = (char *)mmap(0,filesize_i, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+
 
     
-    QuickFile idx_file;
-    idx_file.open_file(Index_filename);
-    KrakenDBIndex db_index(idx_file.ptr());
+    KrakenDBIndex db_index(fptri);
     Database.set_index(&db_index);
+    /////////////////////////////
 
 
     if (! Kraken_output_file.empty()) {                          

@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -Wall -fopenmp -O3
-PROGS = mladen_main
+PROGS = mladen_main 
 
 .PHONY: all clean
 
@@ -16,6 +16,3 @@ krakenutil.o: krakenutil.cpp krakenutil.hpp
 
 krakendb.o: krakendb.cpp krakendb.hpp quickfile.hpp
 	$(CXX) $(CXXFLAGS) -c krakendb.cpp
-
-quickfile.o: quickfile.cpp quickfile.hpp
-	$(CXX) $(CXXFLAGS) -c quickfile.cpp
