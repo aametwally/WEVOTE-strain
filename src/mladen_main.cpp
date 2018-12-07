@@ -2,6 +2,7 @@
 #include "krakendb.hpp"
 #include "krakenutil.hpp"
 #include "krakendb.hpp"
+#include <getopt.h>
 
 
 
@@ -11,10 +12,14 @@ using namespace kraken;
 
 const size_t DEF_WORK_UNIT_SIZE = 500000;
 
+//#fix this too lol
 int Num_threads = 1;
-string Nodes_filename;
-string DB_filename="/export/home/mrasic2/ecoliDB/database.kdb";
+
+//#fix This is not a permanent solution lol
+string Nodes_filename="/export/home/mrasic2/ecoliDB/nodes.dmp";
+string DB_filename=   "/export/home/mrasic2/ecoliDB/database.kdb";
 string Index_filename="/export/home/mrasic2/ecoliDB/database.idx";
+
 string Kraken_output_file;
 bool Print_kraken = true;
 map<uint32_t, uint32_t> Parent_map;
@@ -25,7 +30,8 @@ uint64_t total_classified = 0;
 uint64_t total_sequences = 0;
 
 
-void classify_sequence(string &dna, ostringstream &koss);
+void cmd_line_arguments(int argc, char **argv);
+void classify_sequence(string &dna,string &read_id, ostringstream &koss);
 string hitlist_string(vector<uint32_t> &taxa, vector<uint8_t> &ambig);   
 
 int main(int argc, char **argv){
@@ -33,17 +39,26 @@ int main(int argc, char **argv){
     string seq;
     string dnaseq;
     vector<string> dna_list;
-    ostringstream k1,c1,u1,c2,u2;
+    vector<string> read_id_list;
+    ostringstream k1;
+
+    //Parse command line options
+    cmd_line_arguments(argc,argv);
 
     //Read fasta file and store into array
-    ifstream readsFile( argv[1] ); //read the file in argv1
+    ifstream readsFile( argv[optind] ); //read the file in argv1
     if (readsFile.is_open()){
         while ( getline (readsFile,current_line) ){
             if(current_line.size() > 3 && current_line[0] != '>')
                 dna_list.push_back(current_line);
+            else if(current_line[0] == '>'){
+                current_line.erase(0,1);
+                read_id_list.push_back(current_line);
+            }
         }
     }
 
+    Parent_map = build_parent_map(Nodes_filename);
 
     ////////////////OPEN DATABASE///////////////////////
     int fd;
@@ -58,7 +73,6 @@ int main(int argc, char **argv){
     filesize = sb.st_size;
 
     fptr = (char *)mmap(0,filesize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-    cout << fptr << endl;
 
 
     Database = KrakenDB(fptr);
@@ -92,15 +106,14 @@ int main(int argc, char **argv){
 
 
     k1.str("");
-    c1.str("");
-    u1.str("");
-    c2.str("");
-    u2.str("");
 
 
 
     for (size_t j=0; j < dna_list.size(); j++)
-        classify_sequence(dna_list[j],k1);
+    {
+        //#fix This is very slow -> need to look at krakens
+        classify_sequence(dna_list[j],read_id_list[j],k1);
+    }
 
         (*Kraken_output) << k1.str();
     total_sequences += dna_list.size();
@@ -123,7 +136,7 @@ int main(int argc, char **argv){
 
 
 
-void classify_sequence(string &dna, ostringstream &koss)
+void classify_sequence(string &dna, string &read_id, ostringstream &koss)
 {
     vector<uint32_t> taxa;
     vector<uint8_t> ambig_list;
@@ -171,13 +184,14 @@ void classify_sequence(string &dna, ostringstream &koss)
   else {
     koss << "U\t";
   }
-  koss << call << "\t" << dna.size() << "\t";
+  koss << read_id << "\t"<< call << "\t" << dna.size() << "\t";
 
+  /*
   if (taxa.empty())
       koss <<"0:0";
   else
       koss << hitlist_string(taxa,ambig_list);
-
+  */
   koss << endl;
 
 }
@@ -219,12 +233,23 @@ string hitlist_string(vector<uint32_t> &taxa, vector<uint8_t> &ambig)
   return hitlist.str();
 }
 
+void cmd_line_arguments(int argc, char **argv){
+    int opt;
+    int option_index= 0;
+    //This is the struct for long options, aka to add --db and have it match with -d
+    static struct option long_options[] =
+    { 
+       {"db", required_argument, 0, 'd'} 
+    };
 
+    while ((opt = getopt_long(argc, argv, "d:",long_options,&option_index)) != -1)
+    {
+        switch(opt){
+            case 'd':
+                //DB_filename = optarg;
+                break;
 
-
-
-
-
-
-
-
+            default:
+                break;
+        }}
+}
