@@ -10,3 +10,5 @@ create_db/all
 RUMINO_STUFF
 *rumino*
 src/backup*
+scripts/nodes.dmp
+src/*.fa
