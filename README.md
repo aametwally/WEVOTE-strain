@@ -7,7 +7,7 @@ This is currently a work in progress - current plans for developing the software
 4. Develop a pipeline in order to run WEVOTE at species level followed by WEVOTE at the species level concurrently
 
 
-### Installation
+### Installation.
 
 ### Contents
 
