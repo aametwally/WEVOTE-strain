@@ -1,8 +1,12 @@
 *.swp
 *.o
+*.e
 DATAFILES/*
 src/EVAL
 *.fa
 create_db/all
 *.pbs
 *.fna.gz
+RUMINO_STUFF
+*rumino*
+src/backup*
