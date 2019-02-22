@@ -12,3 +12,4 @@ RUMINO_STUFF
 src/backup*
 scripts/nodes.dmp
 src/*.fa
+src/wvstrain
