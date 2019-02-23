@@ -1,4 +1,4 @@
-# WEVOTE2
+# WEVOTE-strain
 Extension of WEVOTE algorithm to identify  microbes on strain level
 This is currently a work in progress - current plans for developing the software are as follows:
 
