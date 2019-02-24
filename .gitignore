@@ -15,3 +15,5 @@ src/*.fa
 src/wvstrain
 urls.*
 *_dir
+*.pl
+download_taxonomy.sh
