@@ -9,13 +9,15 @@
 # Obviously need to generalize it and change names so they're not ecoli
 
 
+#USAGE: ./post_WEVOTE_script.sh $TAXID $WEVOTE_DETAILS_FILE $ORIGINAL_FASTA $OUTFILE
+
+
 if [ $# -eq 0 ]
 then
     echo "Error: Must provide TAXID as first argument, exiting."
     exit 0
 fi
 
-taxid=562
 
 #1. This line turns the fasta into a single line
 #echo "Converting fasta file to single-line fasta"

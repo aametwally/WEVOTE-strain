@@ -13,3 +13,4 @@ src/backup*
 scripts/nodes.dmp
 src/*.fa
 src/wvstrain
+urls.*
