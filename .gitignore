@@ -14,3 +14,4 @@ scripts/nodes.dmp
 src/*.fa
 src/wvstrain
 urls.*
+*_dir

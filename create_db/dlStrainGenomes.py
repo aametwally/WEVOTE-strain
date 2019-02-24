@@ -12,9 +12,11 @@ This file currently takes the taxid of a species './this_script.py $TAXID' and d
 Once this is complete the files must be built into a database.
 """
 
+#USAGE: ./script.py $taxid $dbname_prefix
 
 
 taxid = int(sys.argv[1])
+dbname = sys.argv[2]
 results = taxid
 
 
@@ -27,32 +29,32 @@ DB_directory = sys.argv[2] + "_dir"
 os.mkdir(DB_directory)
 os.chdir(DB_directory)
 
+
+#Run kraken-build, currently writing a lite version but this works best for now
+krakencall = "kraken-build --download-taxonomy --db " + sys.argv[2]
+os.system(krakencall)
+
+"""
+###TAXONOMY STUFF
 #1. Get accession to taxon map
-print('1')
+print("Accession to Taxon")
 os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_est.accession2taxid.gz")
 os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz")
-print('2')
 os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gss.accession2taxid.gz")
-os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz")
-print('3')
 
-#1.2 get taxonomy tree stuff
+print("Taxonomy Tree")
 os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz")
-print('4')
-
+print("Extracting... (This takes a while)")
+os.system("gunzip *.gz")
+os.system("tar -xvf taxdump.tar")
+"""
 
 #1.3 Get assembly_summary.txt
+print("Download assembly summary")
 os.system("wget -q ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt")
-print('5')
 
 
 #This is to generate a list of species, not currently used
-"""
-with open('rumino_species.txt') as rf:
-    lines = rf.read().splitlines()
-results = list(map(int,lines))
-print(results)
-"""
 
 # 2. Look at assembly summary and if you see the parent species == taxid, grab it.
 tmpfile = open('urls.tmp','w')
@@ -80,13 +82,11 @@ sp.run(["rsync","--no-motd","--files-from=urls.txt","rsync://ftp.ncbi.nlm.nih.go
 print("Extracting Reads")
 os.system('gunzip -r all/*')
 
-dbname = sys.argv[2]
 os.system("find . -name '*.fna' -print0 |     xargs -0 -I{} -n1 kraken-build --add-to-library {} --db %s"%dbname)
 
 #Final step: BUILD DATABASE
 #This needs to be done on qsubmission
 print("building...")
-#os.system("kraken-build --build --db %s"%dbname)
-
+os.system("kraken-build --build --db %s"%dbname)
 
 
