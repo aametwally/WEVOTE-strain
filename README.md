@@ -1,6 +1,6 @@
 # WEVOTE-strain
 Extension of WEVOTE algorithm to identify  microbes on strain level
-This is currently a work in progress - current plans for developing the software are as follows:
+This is currently a work in progress.
 
 
 
@@ -17,6 +17,16 @@ This will create the executable file wvstrain.
 ### Selecting a species
 
 In order the tell WEVOTE strain which species you would like to select, please navigate to https://www.ncbi.nlm.nih.gov/taxonomy and search for the species. Navigating to the species' page will provide you with the taxonomicID. For example, Shigella dysenteriae has a taxonomicID of 622.
+
+### Creating a database
+
+Once a species taxonomic ID has been specified, the script dlStrainGenomes.py can be run to build the k-mer species-of-interest database.
+Note: This process is memory intensive and best run as a job submission. The time for database creation is highly dependent on the number of strains available for the given species. The command to run is:
+```
+python dlStrainGenomes.py $TAXID $DBNAME
+```
+where $TAXID and $DBNAME are the taxonomic ID for the species and your chosen name for the database, respectively. Upon completion the script will create a directory named after your database name with a \_dir suffix. This process utilizes jellyfish, a k-mer counter, as well as various functions from kraken, so make sure both are installed and added to your PATH.
+
 
 ### Running
 
