@@ -3,21 +3,25 @@ import os
 import subprocess as sp
 import fileinput
 import sys
+import argparse
 
 
-"""
-What this file currently does:
 
-This file currently takes the taxid of a species './this_script.py $TAXID' and downloads all NCBI genomes that belong to that species.
-Once this is complete the files must be built into a database.
-"""
+def getArgs():
+    """ Function to get input arguments, currently just <taxid> and <dbname"""
+    parser = argparse.ArgumentParser(description='',epilog='')
+    parser.add_argument("taxid", help="This is the taxonomic ID",type=int)
+    parser.add_argument("dbname", help="This is the database name")
+    args = parser.parse_args()
+    print(args.taxid)
+    taxid = args.taxid
+    dbname = args.dbname
+    return taxid,dbname
 
-#USAGE: ./script.py $taxid $dbname_prefix
+    
 
+taxid, dbname = getArgs()
 
-taxid = int(sys.argv[1])
-dbname = sys.argv[2]
-results = taxid
 
 
 #Get a list of species to look for
@@ -26,9 +30,8 @@ results = taxid
 #of taxids which are all ruminococcus species
 
 DB_directory = sys.argv[2] + "_dir"
-os.mkdir(DB_directory)
+#os.mkdir(DB_directory)
 os.chdir(DB_directory)
-
 
 #Run kraken-build, currently writing a lite version but this works best for now
 krakencall = "kraken-build --download-taxonomy --db " + sys.argv[2]
@@ -87,6 +90,6 @@ os.system("find . -name '*.fna' -print0 |     xargs -0 -I{} -n1 kraken-build --a
 #Final step: BUILD DATABASE
 #This needs to be done on qsubmission
 print("building...")
-os.system("kraken-build --build --db %s"%dbname)
+#os.system("kraken-build --build --db %s"%dbname)
 
 
