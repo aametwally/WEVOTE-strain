@@ -1,14 +1,5 @@
 #!/bin/bash
 
-
-
-#First, extract strain reads from the previous FASTA file
-#TODO LIST: 
-# Change 562 for species of interest.
-# Skip the oneline part
-# Obviously need to generalize it and change names so they're not ecoli
-
-
 #USAGE: ./post_WEVOTE_script.sh $TAXID $WEVOTE_DETAILS_FILE $ORIGINAL_FASTA $OUTFILE
 
 
@@ -22,14 +13,6 @@ fi
 #1. This line turns the fasta into a single line
 #echo "Converting fasta file to single-line fasta"
 #awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' wvcontigs.fa > oneline_contigs.fa
-
-#Load all the taxids iinto a bash list
-input="rumino_species.txt"
-i=0
-while read F ; do
-    taxlist[ $i ]="$F"
-    ((i++))
-done < "$input"
 
 
 #taxid=1264 # a rumino sp
