@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#USAGE: ./post_WEVOTE_script.sh $TAXID $WEVOTE_DETAILS_FILE $ORIGINAL_FASTA $OUTFILE
+#USAGE: ./filterFasta.sh $TAXID $WEVOTE_DETAILS_FILE $ORIGINAL_FASTA $OUTFILE
 
 
 # Input and Exception Handling
@@ -56,7 +56,7 @@ awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { print
 echo ""
 echo "Extracting reads from taxid $taxid ...."
 awk -v taxid="$taxid" '{ if ($NF == taxid) {print $1} }' $wevote_file | \
-    grep -w -A 1 -f - linearfasta.tmp >> $out_fasta
+    grep -m1 -w -A 1 -f - linearfasta.tmp >> $out_fasta
 echo "Done! New Fasta file: $out_fasta"
 
 rm linearfasta.tmp
