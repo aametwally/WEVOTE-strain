@@ -28,7 +28,7 @@ def traverse_tree(taxid):
     phylo_list=[]
     phylo_list.append(taxid)
     while taxid != 1:
-        taxid = parent_tree[taxid] 
+        taxid = parent_tree[taxid]
         phylo_list.append(taxid)
     phylo_list.reverse() #needed to line up columns
     return phylo_list
@@ -56,7 +56,7 @@ def write_trueread_file(reads_file,outfile):
             if tax_id == 0:
                 output_list = [0]*6
             else:
-                phylogeny_list = traverse_tree(tax_id) 
+                phylogeny_list = traverse_tree(tax_id)
                 outF.write(read_id + "\t")
 
                 output_list = [None]*6
@@ -85,8 +85,8 @@ def write_trueread_file(reads_file,outfile):
 def precisionSensitivity(outfile,truefile,rankTree,parentTree):
     """Takes in wevotestrain output and compare to true values"""
     TP = 0
-    FP = 0 
-    FN = 0 
+    FP = 0
+    FN = 0
     trueTaxID = 0
 
     #Generate dictionary of mapping with d[read_ID] = taxid
@@ -104,7 +104,7 @@ def precisionSensitivity(outfile,truefile,rankTree,parentTree):
             colvals = line.strip().split("\t")
             readID = colvals[1]
             taxID = colvals[2]
-            if colvals[0] == 'U':
+            if colvals[0] == 'None':
                 FN += 1
                 continue
             rank = rankTree[int(taxID)].strip()
@@ -134,11 +134,11 @@ def precisionSensitivity(outfile,truefile,rankTree,parentTree):
     Sens = TP/(TP+FN)
     print TP,FP,FN,Prec,Sens
 
-    
 
 
 
-            
+
+
 """Run stuff here"""
 
 s1 = time.time()
@@ -149,7 +149,7 @@ s3 = time.time()
 rankTree = generate_node_rank('nodes.dmp')
 s4 = time.time()
 
-precisionSensitivity('5log.txt','map_simreads.txt',rankTree,parentTree)
+precisionSensitivity('reads_hflu.out','mapping.uh',rankTree,parentTree)
 '''
 s5=time.time()
 write_trueread_file('r1_only_cat_WEVOTE_DETAILS.txt','CLARKphylo.txt')
