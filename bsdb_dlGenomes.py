@@ -108,15 +108,3 @@ os.system("mkdir -p library/added")
 os.system("find . -name '*.fna' | xargs mv -t library/added/")
 
 
-
-
-#### OLD stuff using krakens build
-#os.system("find . -name '*.fna' -print0 |     xargs -0 -I{} -n1 kraken-build --add-to-library {} --db %s"%lib_DB_directory)
-
-#Final step: BUILD DATABASE
-#This needs to be done on qsubmission
-#print("building...")
-#os.system("kraken-build --build --kmer-len 31 --db %s"%lib_DB_directory)
-#os.system("/home/mrasic2/Aug_Kraken/mykraken/built/kraken-build --build --kmer-len 31 --db %s"%lib_DB_directory)
-
-

@@ -11,3 +11,4 @@ scripts/old/
 download_taxonomy.sh
 OLD/
 *.pickle
+db/sandbox/

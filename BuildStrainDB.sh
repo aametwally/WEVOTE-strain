@@ -29,13 +29,13 @@ echo $scripts_dir
 
 # Run
 echo "Step 1: Download Taxonomic and Genomic References"
-python $scripts_dir"/dlStrainGenomes.py"  $taxid $dbname
+python $scripts_dir"/bsdb_dlGenomes.py"  $taxid $dbname
 echo "Step 1 Complete: Files stored in ${dbname}_dir"
 
 pwd
 
 echo "Step 2: "Generate K-mers for each strain""
-bash $scripts_dir"/build_db.sh" $dbfolder
+bash $scripts_dir"/bsdb_countKmers.sh" $dbfolder
 echo "Step 2 Complete: K-mer dumps stored in $dbfolder_jelly"
 
 echo "after step 2 location"
@@ -44,5 +44,5 @@ pwd
 cd $dbfolder_jelly
 
 echo "Step 3:"K-mer filtering and converting to python dictionary""
-python $scripts_dir"/dbRead.py"
+python $scripts_dir"/bsdb_hashKmers.py"
 echo "Step 3 Complete: "
