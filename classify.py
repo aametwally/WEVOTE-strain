@@ -20,6 +20,9 @@ except ImportError:
     sys.stderr.write("Error! SeqIO not found!!\n")
     sys.exit(1)
 
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+
 
 
 kmerLen = 31
@@ -29,39 +32,69 @@ kmerLen = 31
 def getArgs():
     parser = argparse.ArgumentParser(description='',epilog='')
     parser.add_argument("input_fasta", help = "This is the input fasta file",type=str)
+    parser.add_argument("input_fasta2", help = "This is the second input fasta file, requires --paired to be designated.",type=str, nargs='?')
     parser.add_argument("--db", help = "This is the location of the .pickle file created in the database creation process",type=str,required=True)
-    args = parser.parse_args()
-    return args.input_fasta, args.db
+    parser.add_argument("--input_type", help ="Designate between fasta and fastq",choices=['fasta','fastq'],type=str,required=True)
+    parser.add_argument("--paired",action='store_true', help = "This is the paired file flag, requires 2 file inputs.")
 
-def paired():
+    return vars(parser.parse_args())
+
+def paired(params):
     """function to concatenate two paired files into one and return it back into the script"""
-    fasta1 = SeqIO.parse(open(file1),'fasta')
-    fasta2 = SeqIO.parse(open(file2),'fasta')
+    #Important to know that SeqIO parse is a generator function so once you loop through f1 and f2 you change the type of them.
 
-    for i,j in zz:
-        nn = str(i.seq) +"NNNNNNNN"+ str(j.seq)
-        print(nn)
-        # This works, but need to know what to return back
+    # Load files and zip
+    fasta1 = SeqIO.parse(open(params['input_fasta']),params['input_type'])
+    fasta2 = SeqIO.parse(open(params['input_fasta2']),params['input_type'])
+    pairedFasta = zip(fasta1,fasta2)
+
+    # Regenerate new fasta file with new string
+    records = []
+    for f1,f2 in pairedFasta:
+        f1.seq = Seq(str(f1.seq) +"NNNNNNNN"+ str(f2.seq))
+        rec = SeqRecord(f1.seq,id=f1.id)
+        records.append(rec)
+    SeqIO.write(records, 'pairedfasta.tmp', 'fasta')
 
 
 
-
+#### Classification steps begin here ####
 
 
 # Input File, DB directory
-input_file,pickle_dir = getArgs()
+params = getArgs()
+
+if params['paired'] and not params['input_fasta2']:
+    sys.stderr.write('Require two files for paired option\n')
+    sys.exit(0)
+if not params['db']:
+    sys.stderr.write('Database .pickle file is required!\n')
+    sys.exit(0)
+if not os.path.isfile(params['input_fasta']):
+    sys.stderr.write(" Cannot find the input file at: " + params['input_fasta'] +
+            "\n Please located the correct file location")
+    sys.exit(1)
+
+
+
+
 
 
 #  Load the Database
 print('Loading Database..')
-pickle_in = open(pickle_dir, "rb")
+pickle_in = open(params['db'], "rb")
 kdb = pickle.load(pickle_in)
 
 #  Classify to the Database
 print('Classify')
 annot = {}
 numreads=0
-fasta_sequences = SeqIO.parse(open(input_file),'fasta')
+if params['input_fasta2']:
+    paired(params)
+    fasta_sequences = SeqIO.parse(open('pairedfasta.tmp'),params['input_type'])
+else:
+    fasta_sequences = SeqIO.parse(open(params['input_fasta']),params['input_type'])
+
 for fasta in fasta_sequences:
     numreads += 1
     read_id, read_seq = fasta.id, str(fasta.seq)
@@ -74,6 +107,7 @@ for fasta in fasta_sequences:
         else:
             readTaxList.append(currTaxList)
 
+    """Determine taxa designation based on k-mer hits"""
     flattenedTaxa = [y for x in readTaxList for y in x]
     cc = Counter(flattenedTaxa)
     if not len(flattenedTaxa): # no matching kmers
