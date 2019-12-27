@@ -71,15 +71,18 @@ if not os.path.isfile("assembly_summary.txt"):
 
 # 2. Look at assembly summary and if you see the parent species == taxid, grab it.
 tmpfile = open('urls.tmp','w')
-#grab all complete genomes belonging to that species id #$7 is species aka parent taxid
-#explanation: $6 is taxid (if at strain level then shouldn't be equal to species taxid
-#$7 is parent taxid (aka should be equal to species)
-#$12 is assembly_level which should be a complete genome or chromosome
-#20 is the ftp file location
+# grab all complete genomes belonging to that species id #$7 is species aka parent taxid
+# explanation: $6 is taxid (if at strain level then shouldn't be equal to species taxid
+# $7 is parent taxid (aka should be equal to species)
+# $12 is assembly_level which should be a complete genome or chromosome
+# 20 is the ftp file location
 
 
 # Run shell script pulling genome names
-tax_string = 'BEGIN { FS="\t"} { if ($6!=%d && $7==%d && ($12=="Complete Genome" || $12 =="Chromosome" )) print $20;}' % (taxid,taxid)
+# Complete genome only
+tax_string = 'BEGIN { FS="\t"} { if ($6!=%d && $7==%d && ($12=="Complete Genome" )) print $20;}' % (taxid,taxid)
+# Complete genome and chromosome
+#tax_string = 'BEGIN { FS="\t"} { if ($6!=%d && $7==%d && ($12=="Complete Genome" || $12 =="Chromosome" )) print $20;}' % (taxid,taxid)
 cmd = ["awk",tax_string,"assembly_summary.txt"]
 sp.run(cmd,check=True, stdout=tmpfile) #only runs in python 3.5+
 print("grabbed genomes")

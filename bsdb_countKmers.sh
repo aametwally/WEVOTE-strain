@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# for each fasta in library folder, do:
-# This script is part 2 in database creation: It's goal is to create jellyfish k-mer counted files
-# of each of the genomes downloaded in part 1
+# Part 2:
+# This script is part 2 in database creation: It's goal is to create jellyfish k-mer counted files of each of the genomes downloaded in part 1
 
 
 
