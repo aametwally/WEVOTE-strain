@@ -99,15 +99,14 @@ def strainClassify():
         )
         sys.exit(1)
 
-
-#  Load the Database
+    #  Load the Database
     print("Loading Database..")
     pickle_in = open(params["db"], "rb")
     kdb = pickle.load(pickle_in)
 
-#  Classify to the Database
-        print("Classify")
-        annot = {}
+    #  Classify to the Database
+    print("Classify")
+    annot = {}
     numreads = 0
 
     if params["input_fasta2"]:  # Paired Reads
@@ -116,7 +115,7 @@ def strainClassify():
     else:  # Unpaired Reads
         fastaObject = SeqIO.parse(open(params["input_fasta"]), params["input_type"])
 
-# Read Loop
+    # Read Loop
     for fastaRead in fastaObject:
         numreads += 1
         read_id, read_seq = fastaRead.id, str(fastaRead.seq)
@@ -174,29 +173,28 @@ def strainClassify():
 
             # annot[read_id] = cc.most_common(1)[0][0]
 
-    fa = open('cc.txt', 'wb')
+    fa = open("cc.txt", "wb")
     pickle.dump(annot, fa)
 
-    print('ANNOT_VALUES\n')
+    print("ANNOT_VALUES\n")
     print(annot.values())
     # Done with read-by-read loop now.
 
     # grab classified results and convert the values (taxid) to ints
-    #priorProb = [int(x) for x in annot.values() if not isinstance(x, list) and isinstance(x, str)]
+    # priorProb = [int(x) for x in annot.values() if not isinstance(x, list) and isinstance(x, str)]
     # Flatten annot.values() from list of lists to single list
     # priorProb = annot.values()
 
     # convert flat list to ints
-    priorProb = [] #[int(x) for x in priorProb if isinstance(x,str)]
+    priorProb = []  # [int(x) for x in priorProb if isinstance(x,str)]
     for x in annot.values():
         if isinstance(x, list) and len(x) is 1:
             for ii in x:
-                if not isinstance(ii,type(None)):
+                if not isinstance(ii, type(None)):
                     priorProb.append(ii)
 
-
     # Probability dist: First remove the none's and identify unambiguous reads
-    #priorProb = [int(x for x in annot.values() if isinstance(x, list) and len(x) == 1]
+    # priorProb = [int(x for x in annot.values() if isinstance(x, list) and len(x) == 1]
 
     # priorProb2 = [x for x in annot.values() if isinstance(x, list) and len(x) == 1]
     # Step 2: Flatten out the list of lists into just 1 list
@@ -209,11 +207,11 @@ def strainClassify():
                 priorProb.append(item)
     """
 
-    #priorProb = [int(x) for x in priorProb]
+    # priorProb = [int(x) for x in priorProb]
 
     print("PRIORPROB\n")
     print(priorProb)
-        # if not isinstance(x, list) and isinstance(x, str)]
+    # if not isinstance(x, list) and isinstance(x, str)]
     # print("After priorProb", priorProb)
 
     ppCount = Counter(priorProb)
@@ -222,25 +220,25 @@ def strainClassify():
     # Output
 
     # Inference model
-    i=0
+    i = 0
     for read in annot:
         if isinstance(annot[read], list):
             # annot[read] = [t1,t2,t3]
             probList = [ppCount[x] for x in annot[read]]  # [p1, p2, p3]
-            if i%10000 == 0:
+            if i % 10000 == 0:
                 print(type(ppCount[0]), type(annot[read][0]))
-                print("problist",i)
+                print("problist", i)
                 print(probList)
             ind = np.argmax(probList)
             annot[read] = annot[read][ind]  # now its equal to the max prob one
-            i+=1
+            i += 1
         print("read,annot[read]")
         print(read, annot[read])
     print("PROBLIST\n")
     print(probList)
 
-# Calculate abundance
-# convert values to list
+    # Calculate abundance
+    # convert values to list
     freq = {}
     taxList = list(annot.values())
     for item in taxList:
@@ -249,44 +247,48 @@ def strainClassify():
         else:
             freq[item] = 1
 
-# Filter out low hits
+    # Filter out low hits
     belowThreshKeys = list()
     THRESH = 0.001
-# Generate list of taxa to delete
+    # Generate list of taxa to delete
     for key, value in freq.items():
         if value < THRESH * numreads:
             belowThreshKeys.append(key)
 
-# Go through dict and delete these
+    # Go through dict and delete these
     for key in belowThreshKeys:
         if key in freq:
             del freq[key]
 
-# Move Unclassified out of dict
+    # Move Unclassified out of dict
     uReads = freq[None]
     del freq[None]
 
 
-""" Output stuff """
+    """ Output stuff """
 
-"""
-    TODO:
-    This also needs to be organized and cleaned up
-    Also add the list of k-mers for each read like kraken does
-"""
+    """
+        TODO:
+        This also needs to be organized and cleaned up
+        Also add the list of k-mers for each read like kraken does
+    """
 
-# Calculate filtered abundances
-print("Abundance Info")
-for key, value in freq.items():
-    abund = round(value / sum(freq.values()), 3)
-    print("% s : % s" % (key, abund))
+    # Calculate filtered abundances
+    print("Abundance Info")
+    for key, value in freq.items():
+        abund = round(value / sum(freq.values()), 3)
+        print("% s : % s" % (key, abund))
 
-print("Total unfiltered counts")
-print(sum(freq.values()))
-# currrently numreads is const, but if im filtering i need to add up the values of all the filters and then do numreads - sum(values)
+    print("Total unfiltered counts")
+    print(sum(freq.values()))
+    # currrently numreads is const, but if im filtering i need to add up the values of all the filters and then do numreads - sum(values)
 
-print("Unclassified Reads")
-print(uReads)
+    print("Unclassified Reads")
+    print(uReads)
 
-print("Total # of Reads")
-print(numreads)
+    print("Total # of Reads")
+    print(numreads)
+    return 0
+
+
+strainClassify()
