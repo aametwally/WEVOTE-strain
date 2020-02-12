@@ -14,6 +14,13 @@ fi
 # Input variables
 taxid=$1
 dbname=$2
+
+if [ -z "$3" ]; then
+    kmerlen=31
+else
+    kmerlen=$3
+fi
+
 dbfolder="${dbname}_dir"
 dbfolder_jelly="${dbfolder}/jelly"
 
@@ -35,7 +42,7 @@ echo "Step 1 Complete: Files stored in ${dbname}_dir"
 pwd
 
 echo "Step 2: "Generate K-mers for each strain""
-bash $scripts_dir"/bsdb_countKmers.sh" $dbfolder
+bash $scripts_dir"/bsdb_countKmers.sh" $dbfolder $kmerlen
 echo "Step 2 Complete: K-mer dumps stored in $dbfolder_jelly"
 
 echo "after step 2 location"

@@ -6,6 +6,13 @@
 
 
 dbdir=$1
+
+if [ -z "$2" ]; then
+    kmerlen=31
+else
+    kmerlen=$2
+fi
+
 echo $dbdir
 cd $dbdir
 ls
@@ -47,7 +54,7 @@ do
     #  Generate Kmers
     echo  "jellyfish dump for ${fasta} located in jelly/${taxID}.jdb"
     if [ ! -f jelly/$taxID.jdb ]; then
-        jellyfish count -m31 -s 100M $fasta #make kmerdb
+        jellyfish count -m $kmerlen -s 100M $fasta #make kmerdb
         jellyfish dump mer_counts_0 > jelly/$taxID.jdb #  dumb db to a file
         sed -i '/^>/d' jelly/$taxID.jdb #  remove the counter lines
     else

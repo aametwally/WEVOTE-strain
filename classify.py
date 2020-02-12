@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import argparse
@@ -25,8 +27,6 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 
-kmerLen = 31
-
 
 def getArgs():
     parser = argparse.ArgumentParser(description="", epilog="")
@@ -42,6 +42,11 @@ def getArgs():
         help="This is the location of the .pickle file created in the database creation process",
         type=str,
         required=True,
+    )
+    parser.add_argument(
+        "--kmerLen",
+        help="Designate the kmer length used in DATABASE,defaults to 31",
+        type=int,
     )
     parser.add_argument(
         "--input_type",
@@ -84,6 +89,11 @@ def paired(params):
 def strainClassify():
     # Input File, DB directory
     params = getArgs()
+
+    if not params["kmerLen"]:
+        kmerLen=31
+    else:
+        kmerLen=params["kmerLen"]
 
     if params["paired"] and not params["input_fasta2"]:
         sys.stderr.write("Require two files for paired option\n")
